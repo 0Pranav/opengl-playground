@@ -145,7 +145,6 @@ int main()
   
 	uniform Light light;  
 	uniform Material material;
-	uniform vec3 objectColor;
 	uniform vec3 viewPos;
 
 	out vec4 FragColor;
@@ -165,9 +164,9 @@ int main()
 		vec3 viewDir = normalize(viewPos - FragPos);
 		vec3 reflectDir = reflect(-lightDir, norm);  
 		float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-		vec3 specular = (material.specular) * spec * light.specular;  
+		vec3 specular = (material.specular * spec) * light.specular;  
 
-		vec3 result = (ambient + diffuse + specular) * objectColor;
+		vec3 result = (ambient + diffuse + specular);
 		FragColor = vec4(result, 1.0);
 	}
 	)";
@@ -216,17 +215,15 @@ int main()
 	glfwSetWindowSizeCallback(window, framebufferSizeCallback);
 	glm::mat4 projection = glm::perspective(glm::radians(50.0f), (float)1280 / 720, 0.1f, 100.0f);
 	shader.Bind();
-	shader.SetVec3("objectColor", 1.0f, 0.5f, 0.31f);
-	shader.SetVec3("lightColor", 1.0f, 1.0f, 1.0f);
-	shader.SetVec3("material.ambient", 0.1f, 0.1f, 0.1f);
+	shader.SetVec3("material.ambient", 1.0f, 0.5f, 0.31f);
 	shader.SetVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
 	shader.SetVec3("material.specular", 0.5f, 0.5f, 0.5f);
+	shader.SetFloat("material.shininess", 32.0f);
 
 	shader.SetVec3("light.ambient", 0.1f, 0.1f, 0.1f);
 	shader.SetVec3("light.diffuse", 1.0f, 0.5f, 0.31f);
 	shader.SetVec3("light.specular", 0.5f, 0.5f, 0.5f);
 
-	shader.SetFloat("material.shininess", 32.0f);
 	shader.Unbind();
 	glEnable(GL_DEPTH_TEST);
 
