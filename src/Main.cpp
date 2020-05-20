@@ -124,34 +124,48 @@ int main()
 	)";
 	std::string fragSrc = R"(
 	#version 450 core
-	
+		
+	struct Material {
+		vec3 ambient;
+		vec3 diffuse;
+		vec3 specular;
+		float shininess;
+	}; 
+  
+	struct Light {
+		vec3 position;
+  
+		vec3 ambient;
+		vec3 diffuse;
+		vec3 specular;
+	};
+
 	in vec3 Normal;
 	in vec3 FragPos;
   
+	uniform Light light;  
+	uniform Material material;
 	uniform vec3 objectColor;
-	uniform vec3 lightColor;
-	uniform vec3 lightPos;
 	uniform vec3 viewPos;
 
 	out vec4 FragColor;
 
 	void main()
 	{
-		float ambientStrength = 0.25;
-		vec3 ambient = ambientStrength * vec3(1.0);
+		vec3 ambient = material.ambient * light.ambient;
 
 		// Diffuse
 		vec3 norm = normalize(Normal);
-		vec3 lightDir = normalize(lightPos - FragPos);
+		vec3 lightDir = normalize(light.position - FragPos);
 		float diff = max(dot(norm, lightDir), 0.0);
-		vec3 diffuse = diff * lightColor;
+		vec3 diffuse = (diff * material.diffuse) * light.diffuse ;
 
 		// Specular
 		float specularStrength = 0.5;
 		vec3 viewDir = normalize(viewPos - FragPos);
 		vec3 reflectDir = reflect(-lightDir, norm);  
-		float spec = pow(max(dot(viewDir, reflectDir), 0.0), 256);
-		vec3 specular = specularStrength * spec * lightColor;  
+		float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+		vec3 specular = (material.specular) * spec * light.specular;  
 
 		vec3 result = (ambient + diffuse + specular) * objectColor;
 		FragColor = vec4(result, 1.0);
@@ -204,6 +218,15 @@ int main()
 	shader.Bind();
 	shader.SetVec3("objectColor", 1.0f, 0.5f, 0.31f);
 	shader.SetVec3("lightColor", 1.0f, 1.0f, 1.0f);
+	shader.SetVec3("material.ambient", 0.1f, 0.1f, 0.1f);
+	shader.SetVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
+	shader.SetVec3("material.specular", 0.5f, 0.5f, 0.5f);
+
+	shader.SetVec3("light.ambient", 0.1f, 0.1f, 0.1f);
+	shader.SetVec3("light.diffuse", 1.0f, 0.5f, 0.31f);
+	shader.SetVec3("light.specular", 0.5f, 0.5f, 0.5f);
+
+	shader.SetFloat("material.shininess", 32.0f);
 	shader.Unbind();
 	glEnable(GL_DEPTH_TEST);
 
@@ -219,7 +242,7 @@ int main()
 		auto view = camera.GetLookAtMatrix();
 		shader.SetMat4("transform", transform);
 		shader.SetMat4("view", view);
-		shader.SetVec3("lightPos", lightPos.x, lightPos.y, lightPos.z);
+		shader.SetVec3("light.position", lightPos.x, lightPos.y, lightPos.z);
 		const glm::vec3 cameraPos = camera.GetCameraPos();
 		shader.SetVec3("viewPos", cameraPos.x, cameraPos.y, cameraPos.z);
 		glBindVertexArray(VAO);
