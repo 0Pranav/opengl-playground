@@ -103,84 +103,85 @@ int main()
 	glm::mat4 transform = glm::mat4(1);
 	// Shader
 	std::string vertexSrc = R"(
+		#version 450 core
+		layout (location = 0) in vec3 aPos;   // the position variable has attribute position 0
+		layout (location = 1) in vec3 aNormal;
+
+		uniform mat4 transform;
+		uniform mat4 view;
+		uniform mat4 projection;
+	
+		uniform vec3 objectColor;
+		uniform vec3 lightColor;
+		uniform vec3 lightPos;
+		uniform vec3 viewPos;
+
+		out vec3 Normal;
+		out vec3 FragPos;
+		out vec3 result;
+
+		void main()
+		{
+
+			// ambient 
+			float ambientStrength = 0.25;
+			vec3 ambient = ambientStrength * lightColor;
+
+			// Diffuse
+			vec3 normal = normalize(aNormal);
+			vec3 lightDir = normalize(lightPos - aPos);
+			float diff = max(dot(normal, lightDir), 0.0);
+			vec3 diffuse = diff * lightColor;
 		
-	#version 450 core
-	layout (location = 0) in vec3 aPos;   // the position variable has attribute position 0
-	layout (location = 1) in vec3 aNormal;
+			// Specular
+			float specularStrength = 0.5;
+			float shininess = 32;
+			vec3 reflectDir = reflect(-lightDir, normal);
+			vec3 viewDir = normalize(viewPos - aPos);
+			float spec = pow(max(dot(reflectDir, viewDir),0.0), shininess);
+			vec3 specular = specularStrength * spec * lightColor;
+		
+			result = (ambient + diffuse + specular) * objectColor;
 
-	uniform mat4 transform;
-	uniform mat4 view;
-	uniform mat4 projection;
-
-	out vec3 Normal;
-	out vec3 FragPos;
-
-	void main()
-	{
-		gl_Position =  projection * view * transform * vec4(aPos, 1.0);
-		FragPos = vec3(transform * vec4(aPos, 1.0));
-		Normal = aNormal;
-	}       
+			gl_Position =  projection * view * transform * vec4(aPos, 1.0);
+		}       
 	)";
 	std::string fragSrc = R"(
-	#version 450 core
+		#version 450 core
 	
-	in vec3 Normal;
-	in vec3 FragPos;
-  
-	uniform vec3 objectColor;
-	uniform vec3 lightColor;
-	uniform vec3 lightPos;
-	uniform vec3 viewPos;
+		in vec3 result;
 
-	out vec4 FragColor;
+		out vec4 FragColor;
 
-	void main()
-	{
-		float ambientStrength = 0.25;
-		vec3 ambient = ambientStrength * vec3(1.0);
-
-		// Diffuse
-		vec3 norm = normalize(Normal);
-		vec3 lightDir = normalize(lightPos - FragPos);
-		float diff = max(dot(norm, lightDir), 0.0);
-		vec3 diffuse = diff * lightColor;
-
-		// Specular
-		float specularStrength = 0.5;
-		vec3 viewDir = normalize(viewPos - FragPos);
-		vec3 reflectDir = reflect(-lightDir, norm);  
-		float spec = pow(max(dot(viewDir, reflectDir), 0.0), 256);
-		vec3 specular = specularStrength * spec * lightColor;  
-
-		vec3 result = (ambient + diffuse + specular) * objectColor;
-		FragColor = vec4(result, 1.0);
-	}
+		void main()
+		{
+			FragColor = vec4(result, 1.0);
+		}
 	)";
 
 	std::string fragSrcLamp = R"(
-	#version 450 core
-	out vec4 FragColor;
+		#version 450 core
+		out vec4 FragColor;
 
 
-	void main()
-	{
-		FragColor = vec4(1.0);
-	}
+		void main()
+		{
+			FragColor = vec4(1.0);
+		}
 	)";
 	std::string vertexSrcLamp = R"(
 		
-	#version 450 core
-	layout (location = 0) in vec3 aPos;   // the position variable has attribute position 0
+		#version 450 core
+		layout (location = 0) in vec3 aPos;   // the position variable has attribute position 0
 	
-	uniform mat4 transform;
-	uniform mat4 view;
-	uniform mat4 projection;
+		uniform mat4 transform;
+		uniform mat4 view;
+		uniform mat4 projection;
 
-	void main()
-	{
-		gl_Position =  projection * view * transform * vec4(aPos, 1.0);
-	}       
+		void main()
+		{
+			gl_Position =  projection * view * transform * vec4(aPos, 1.0);
+		}       
 	)";
 
 	Shader shader(vertexSrc, fragSrc);
