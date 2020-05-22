@@ -6,6 +6,7 @@
 #include <stb_image.h>
 #include "Shader.h"
 #include "Camera.h"
+#include "VertexBuffer.h"
 
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
@@ -89,9 +90,8 @@ int main()
 		-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
 		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
 	};
-	glCreateBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	
+	VertexBuffer vb(vertices, sizeof(vertices));
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(sizeof(float) * 3));
@@ -250,7 +250,7 @@ int main()
 	uint32_t lightVAO;
 	glCreateVertexArrays(1, &lightVAO);
 	glBindVertexArray(lightVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);	
+	vb.Bind();
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(sizeof(float) * 3));
@@ -262,9 +262,7 @@ int main()
 	glfwSetCursorPosCallback(window, mouseCallback);
 	glfwSetWindowSizeCallback(window, framebufferSizeCallback);
 	glm::mat4 projection = glm::perspective(glm::radians(50.0f), (float)1280 / 720, 0.1f, 100.0f);
-	shader.Bind();/*
-	shader.SetVec3("material.ambient", 1.0f, 0.5f, 0.31f);
-	shader.SetVec3("material.diffuse", 1.0f, 0.5f, 0.31f);*/
+	shader.Bind();
 	shader.SetVec3("material.specular", 0.5f, 0.5f, 0.5f);
 	shader.SetFloat("material.shininess", 256.0f);
 
