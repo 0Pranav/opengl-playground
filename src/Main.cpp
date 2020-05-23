@@ -8,6 +8,7 @@
 #include "Camera.h"
 #include "VertexBuffer.h"
 #include "VertexArray.h"
+#include "Texture.h"
 
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
@@ -110,46 +111,9 @@ int main()
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	
 	// Load Texture //////////////////////////////////////////////////////////////
-	int texWidth, texHeight, nrChannels = 0;
-	auto data = stbi_load("res/container.png",&texWidth, &texHeight, &nrChannels, NULL);
-	uint32_t diffuseTexture;
-	glActiveTexture(GL_TEXTURE0);
-	glGenTextures(1, &diffuseTexture);
-	glBindTexture(GL_TEXTURE_2D, diffuseTexture);
-	GLenum format;
-	if (nrChannels == 1)
-		format = GL_RED;
-	else if (nrChannels == 3)
-		format = GL_RGB;
-	else if (nrChannels == 4)
-		format = GL_RGBA;
-	glTexImage2D(GL_TEXTURE_2D, 0, format, texWidth, texHeight, 0, format, GL_UNSIGNED_BYTE, data);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glGenerateMipmap(GL_TEXTURE_2D);
-	stbi_image_free(data);
-
-	auto specularData = stbi_load("res/specular.png", &texWidth, &texHeight, &nrChannels, NULL);
-	uint32_t specularTexture;
-	glActiveTexture(GL_TEXTURE1);
-	glGenTextures(1, &specularTexture);
-	glBindTexture(GL_TEXTURE_2D, specularTexture);
-	if (nrChannels == 1)
-		format = GL_RED;
-	else if (nrChannels == 3)
-		format = GL_RGB;
-	else if (nrChannels == 4)
-		format = GL_RGBA;
-	glTexImage2D(GL_TEXTURE_2D, 0, format, texWidth, texHeight, 0, format, GL_UNSIGNED_BYTE, specularData); 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glGenerateMipmap(GL_TEXTURE_2D);
-	stbi_image_free(specularData);
+	Texture diffuseTexture("res/container.png",0);
+	Texture specularTexture("res/specular.png",1);
 
 	glm::mat4 transform = glm::mat4(1);
 	// Shader ////////////////////////////////////////////////////////////////////
