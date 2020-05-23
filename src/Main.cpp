@@ -117,110 +117,15 @@ int main()
 
 	glm::mat4 transform = glm::mat4(1);
 	// Shader ////////////////////////////////////////////////////////////////////
-	std::string vertexSrc = R"(
-		
-	#version 450 core
-	layout (location = 0) in vec3 aPos;
-	layout (location = 1) in vec3 aNormal;
-	layout (location = 2) in vec2 aTexCoords;
-
-	uniform mat4 transform;
-	uniform mat4 view;
-	uniform mat4 projection;
-
-	out vec3 Normal;
-	out vec3 FragPos;
-	out vec2 TexCoords;
-
-	void main()
-	{
-		gl_Position =  projection * view * transform * vec4(aPos, 1.0);
-		FragPos = vec3(transform * vec4(aPos, 1.0));
-		Normal = mat3(transpose(inverse(transform))) * aNormal;  
-		TexCoords = aTexCoords;
-	}       
-	)";
-	std::string fragSrc = R"(
-	#version 450 core
-		
-	struct Material {
-		sampler2D diffuse;
-		sampler2D specular;
-		float shininess;
-	}; 
-  
-	struct Light {
-		vec3 position;
-  
-		vec3 ambient;
-		vec3 diffuse;
-		vec3 specular;
-	};
-
-	in vec3 Normal;
-	in vec3 FragPos;
-	in vec2 TexCoords;
-  
-	uniform Light light;  
-	uniform Material material;
-	uniform vec3 viewPos;
-
-	out vec4 FragColor;
-
-	void main()
-	{
-		vec3 ambient = texture2D(material.diffuse, TexCoords).rgb * light.ambient;
-
-		// Diffuse
-		vec3 norm = normalize(Normal);
-		vec3 lightDir = normalize(light.position - FragPos);
-		float diff = max(dot(norm, lightDir), 0.0);
-		vec3 diffuse = (diff * texture2D(material.diffuse, TexCoords).rgb) * light.diffuse ;
-
-		// Specular
-		float specularStrength = 0.5;
-		vec3 viewDir = normalize(viewPos - FragPos);
-		vec3 reflectDir = reflect(-lightDir, norm);  
-		float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-		vec3 specular = (texture2D(material.specular, TexCoords).rgb * spec) * light.specular;  
-
-		vec3 result = (ambient + diffuse + specular);
-		FragColor = vec4(result, 1.0);
-	}
-	)";
-
-	std::string fragSrcLamp = R"(
-	#version 450 core
-	out vec4 FragColor;
 
 
-	void main()
-	{
-		FragColor = vec4(1.0);
-	}
-	)";
-	std::string vertexSrcLamp = R"(
-		
-	#version 450 core
-	layout (location = 0) in vec3 aPos;   // the position variable has attribute position 0
-	
-	uniform mat4 transform;
-	uniform mat4 view;
-	uniform mat4 projection;
-
-	void main()
-	{
-		gl_Position =  projection * view * transform * vec4(aPos, 1.0);
-	}       
-	)";
-
-	Shader shader(vertexSrc, fragSrc);
+	Shader shader("res/shaders/cube");
 
 
 	VertexArray lightVAO;
 	lightVAO.Bind();
 	lightVAO.AddBuffer(vb);
-	Shader lightShader(vertexSrcLamp, fragSrcLamp);
+	Shader lightShader("res/shaders/lamp");
 	glm::vec3 lightPos = glm::vec3(3.0, 3.0, -3.0);
 	
 	glfwSetKeyCallback(window, key_callback);

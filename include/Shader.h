@@ -5,12 +5,15 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <fstream>
 
 class Shader
 {
 public:
-	Shader(const std::string& vertexSrc, const std::string& fragmentSrc);
+	Shader(const std::string& path);
 	~Shader();
+
+	std::string LoadFile(std::string path);
 	void Bind();
 	void Unbind();
 
@@ -22,7 +25,6 @@ public:
 	void SetVec3(const std::string& name, float x, float y, float z);
 	inline uint32_t GetID() { return m_Handle; };
 private:
-	
 	uint32_t m_Handle;
 };
 

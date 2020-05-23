@@ -1,8 +1,10 @@
 #include "Shader.h"
 #include <iostream>
 
-Shader::Shader(const std::string& vertexSource, const std::string& fragmentSource)
+Shader::Shader(const std::string& path)
 {
+	std::string vertexSource = LoadFile(path + ".vs");
+	std::string fragmentSource = LoadFile(path + ".fs");
 	// Create an empty vertex shader handle
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 
@@ -114,6 +116,25 @@ Shader::Shader(const std::string& vertexSource, const std::string& fragmentSourc
 Shader::~Shader()
 {
 	glDeleteProgram(m_Handle);
+}
+
+std::string Shader::LoadFile(std::string path)
+{
+	std::string result;
+	std::string line;
+	std::ifstream file;
+	file.open(path.c_str());
+
+	if (file.is_open())
+	{
+		while (file.good())
+		{
+			std::getline(file, line);
+			result.append(line + "\n");
+		}
+		return result;
+	}
+	return "";
 }
 
 void Shader::Bind()
