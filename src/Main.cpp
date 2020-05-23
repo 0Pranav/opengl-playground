@@ -7,6 +7,7 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "VertexBuffer.h"
+#include "VertexArray.h"
 
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
@@ -40,12 +41,9 @@ int main()
 	gladLoadGL();
 
 	// Vertex Array Object
-	uint32_t VAO;
-	glCreateVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
-
+	VertexArray vao;
+	vao.Bind();
 	// VBO
-	uint32_t VBO;
 	float vertices[] = {
 		// positions          // normals           // texture coords
 		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
@@ -91,13 +89,21 @@ int main()
 		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
 	};
 	
-	VertexBuffer vb(vertices, sizeof(vertices));
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);
+	std::shared_ptr<VertexBuffer> vb;
+	vb.reset(new VertexBuffer(vertices, sizeof(vertices)));
+	BufferLayout layout = {
+		 BufferElement("position",3),
+		 BufferElement("normal",3),
+		 BufferElement("TexCoords",2)
+	};
+	vb->SetLayout(layout);
+	vao.AddBuffer(vb);
+	/*glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(sizeof(float) * 3));
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(sizeof(float) * 6));
-	glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(2);*/
 
 	lastX = 1280 / 2;
 	lastY = 720 / 2;
@@ -247,14 +253,9 @@ int main()
 	Shader shader(vertexSrc, fragSrc);
 
 
-	uint32_t lightVAO;
-	glCreateVertexArrays(1, &lightVAO);
-	glBindVertexArray(lightVAO);
-	vb.Bind();
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(sizeof(float) * 3));
-	glEnableVertexAttribArray(1);
+	VertexArray lightVAO;
+	lightVAO.Bind();
+	lightVAO.AddBuffer(vb);
 	Shader lightShader(vertexSrcLamp, fragSrcLamp);
 	glm::vec3 lightPos = glm::vec3(3.0, 3.0, -3.0);
 	
@@ -263,7 +264,6 @@ int main()
 	glfwSetWindowSizeCallback(window, framebufferSizeCallback);
 	glm::mat4 projection = glm::perspective(glm::radians(50.0f), (float)1280 / 720, 0.1f, 100.0f);
 	shader.Bind();
-	shader.SetVec3("material.specular", 0.5f, 0.5f, 0.5f);
 	shader.SetFloat("material.shininess", 256.0f);
 
 	shader.SetVec3("light.ambient", 0.1f, 0.1f, 0.1f);
@@ -292,20 +292,16 @@ int main()
 		shader.SetVec3("light.position", lightPos.x, lightPos.y, lightPos.z);
 		const glm::vec3 cameraPos = camera.GetCameraPos();
 		shader.SetVec3("viewPos", cameraPos.x, cameraPos.y, cameraPos.z);
-		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, sizeof(vertices));
-		glBindVertexArray(0);
+		vao.DrawArray();
 		shader.Unbind();
 
 		lightShader.Bind();
-		lightShader.SetMat4("projection", projection);
 		auto lightTransform = glm::translate(glm::mat4(1), lightPos);
 		lightTransform = glm::scale(lightTransform, glm::vec3(0.1));
 		lightShader.SetMat4("transform", lightTransform);
+		lightShader.SetMat4("projection", projection);
 		lightShader.SetMat4("view", view);
-		glBindVertexArray(lightVAO);
-		glDrawArrays(GL_TRIANGLES, 0, sizeof(vertices));
-		glBindVertexArray(0);
+		lightVAO.DrawArray();
 		lightShader.Unbind();
 
 		glfwPollEvents();
