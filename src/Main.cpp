@@ -99,12 +99,6 @@ int main()
 	};
 	vb->SetLayout(layout);
 	vao.AddBuffer(vb);
-	/*glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(sizeof(float) * 3));
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(sizeof(float) * 6));
-	glEnableVertexAttribArray(2);*/
 
 	lastX = 1280 / 2;
 	lastY = 720 / 2;
@@ -118,9 +112,7 @@ int main()
 	glm::mat4 transform = glm::mat4(1);
 	// Shader ////////////////////////////////////////////////////////////////////
 
-
 	Shader shader("res/shaders/cube");
-
 
 	VertexArray lightVAO;
 	lightVAO.Bind();
@@ -216,5 +208,4 @@ void mouseCallback(GLFWwindow* window, double xPos, double yPos)
 	lastY = yPos;
 
 	camera.ProcessMouseMovement(xOffset, yOffset);
-
 }
