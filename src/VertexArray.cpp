@@ -48,7 +48,7 @@ void VertexArray::DrawArray()
 {
 	this->Bind();
 	for (auto buffer : m_VertexBuffers) 
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glDrawArrays(GL_TRIANGLES, 0, buffer->GetCount());
 	this->Unbind();
 }
 

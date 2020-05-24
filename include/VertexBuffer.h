@@ -35,7 +35,7 @@ public:
 	std::vector<BufferElement>::const_iterator begin() const { return m_Elements.begin(); }
 	std::vector<BufferElement>::const_iterator end() const { return m_Elements.end(); }
 
-	uint32_t GetStride()
+	uint32_t GetStride() const
 	{
 		return m_Stride;
 	}
@@ -64,6 +64,7 @@ public:
 	void SetLayout(const BufferLayout& layout);
 
 	inline uint32_t GetSize() const { return m_Size;  };
+	inline uint32_t GetCount() const { return GetSize() / m_Layout.GetStride(); };
 	void Bind() const;
 	void Unbind() const;
 private:
