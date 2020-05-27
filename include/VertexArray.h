@@ -19,6 +19,6 @@ public:
 	void DrawIndexed();
 private:
 	uint32_t m_Handle;
-	std::vector<std::shared_ptr<VertexBuffer>> m_VertexBuffers;
+	std::shared_ptr<VertexBuffer> m_VertexBuffer;
 	std::shared_ptr<IndexBuffer> m_IndexBuffer;
 };

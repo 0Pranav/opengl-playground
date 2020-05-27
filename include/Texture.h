@@ -6,10 +6,16 @@
 class Texture
 {
 public:
-	Texture(const std::string& path, uint32_t index);
+	Texture(const std::string& path);
 	~Texture();
-	std::string GetType() { return m_Type; };
-	uint32_t GetID() { return m_Handle; };
+
+	const std::string GetType() const { return m_Type; };
+	void SetType(const std::string& type) { m_Type = type; }
+	const uint32_t GetID() const { return m_Handle; };
+
+	void Bind(unsigned int slot = 0 );
+	void Unbind();
+
 private:
 	uint32_t m_Handle;
 	std::string m_Type;

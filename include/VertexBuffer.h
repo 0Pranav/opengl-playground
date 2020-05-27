@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <Vertex.h>
 
 struct BufferElement
 {
@@ -59,6 +60,7 @@ class VertexBuffer
 {
 public:
 	VertexBuffer(float* vertices, uint32_t size);
+	VertexBuffer(Vertex* vertices, uint32_t size);
 	~VertexBuffer();
 	const BufferLayout& GetLayout() const;
 	void SetLayout(const BufferLayout& layout);
@@ -82,7 +84,7 @@ public:
 	void Bind() const ;
 	void Unbind() const ;
 
-	virtual uint32_t GetCount() const { return m_Count; };
+	const uint32_t GetCount() const { return m_Count; };
 private:
 	uint32_t m_RendererID = 0;
 	uint32_t m_Count = 0;

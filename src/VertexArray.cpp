@@ -24,7 +24,7 @@ void VertexArray::AddBuffer(std::shared_ptr<VertexBuffer> buffer)
 		glVertexAttribPointer(index, element.Count, GL_FLOAT, GL_FALSE, layout.GetStride(), (const void*)element.Offset);
 		index++;
 	}
-	m_VertexBuffers.push_back(buffer);
+	m_VertexBuffer = buffer;
 }
 
 void VertexArray::SetIndexBuffer(std::shared_ptr<IndexBuffer> indexBuffer)
@@ -47,11 +47,13 @@ void VertexArray::Unbind()
 void VertexArray::DrawArray()
 {
 	this->Bind();
-	for (auto buffer : m_VertexBuffers) 
-		glDrawArrays(GL_TRIANGLES, 0, buffer->GetCount());
+	glDrawArrays(GL_TRIANGLES, 0, m_VertexBuffer->GetCount());
 	this->Unbind();
 }
 
 void VertexArray::DrawIndexed()
 {
+	this->Bind();
+	glDrawElements(GL_TRIANGLES, m_IndexBuffer->GetCount(), GL_UNSIGNED_INT, (const void*)0);
+	this->Unbind();
 }
