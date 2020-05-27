@@ -64,7 +64,8 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 			texCoords.x = mesh->mTextureCoords[0][i].x;
 			texCoords.y = mesh->mTextureCoords[0][i].y;
 		}
-		texCoords = glm::vec2(0);
+		else
+			texCoords = glm::vec2(0);
 		// process vertex positions, normals and texture coordinates
 		
 		vertices.push_back(Vertex(pos, normal, texCoords));
