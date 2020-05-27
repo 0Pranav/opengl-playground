@@ -6,7 +6,7 @@
 #include <stb_image.h>
 #include "Camera.h"
 #include "Texture.h"
-#include "Mesh.h"
+#include "Model.h"
 
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
@@ -42,7 +42,7 @@ int main()
 	// Vertex Array Object
 	// VBO
 	std::vector<Vertex> vertices = {
-		// positions					 // normals						 // texture coords
+		// positions							// normals						// texture coords
 		Vertex(glm::vec3(-0.5f, -0.5f, -0.5f),  glm::vec3(0.0f,  0.0f, -1.0f),  glm::vec2(0.0f, 0.0f)),
 		Vertex(glm::vec3( 0.5f, -0.5f, -0.5f),  glm::vec3(0.0f,  0.0f, -1.0f),  glm::vec2(1.0f, 0.0f)),
 		Vertex(glm::vec3( 0.5f,  0.5f, -0.5f),  glm::vec3(0.0f,  0.0f, -1.0f),  glm::vec2(1.0f, 1.0f)),
@@ -91,9 +91,6 @@ int main()
 		indices.push_back(i);
 
 
-	lastX = 1280 / 2;
-	lastY = 720 / 2;
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	
 	// Load Texture //////////////////////////////////////////////////////////////
 	std::vector<Texture> textures;
@@ -101,19 +98,27 @@ int main()
 	diffuseTexture.SetType("texture_diffuse");
 	textures.push_back(diffuseTexture);
 
+	// Create Mesh
+	//Mesh* cube = new Mesh(vertices, indices, textures);
+	Model model("res/model/backpack.obj");
+
 	// Shader ////////////////////////////////////////////////////////////////////
 
 	Shader shader("res/shaders/cube-mesh");
-	Mesh* cube = new Mesh(vertices, indices, textures);
 	glm::vec3 lightPos = glm::vec3(3.0, 3.0, -3.0);
 	
+	glm::mat4 projection = glm::perspective(glm::radians(50.0f), (float)1280 / 720, 0.1f, 100.0f);
+	glm::mat4 transform = glm::mat4(1);
+	transform = glm::scale(transform, glm::vec3(0.3));
+
+
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetCursorPosCallback(window, mouseCallback);
 	glfwSetWindowSizeCallback(window, framebufferSizeCallback);
-	glm::mat4 projection = glm::perspective(glm::radians(50.0f), (float)1280 / 720, 0.1f, 100.0f);
-	glm::mat4 transform = glm::mat4(1);
 	glEnable(GL_DEPTH_TEST);
-
+	lastX = 1280 / 2;
+	lastY = 720 / 2;
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -126,7 +131,8 @@ int main()
 		shader.SetMat4("projection", projection);
 		shader.SetMat4("model", transform);
 		shader.SetMat4("view", view);
-		cube->Draw(shader);
+		//cube->Draw(shader);
+		model.Draw();
 		shader.Unbind();
 
 		glfwPollEvents();
