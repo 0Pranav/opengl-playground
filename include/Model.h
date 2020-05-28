@@ -16,11 +16,12 @@ public:
     {
         loadModel(path);
     }
-    void Draw() const;
+    void Draw(const Shader& shader) const;
 private:
     // model data
     std::vector<Mesh> m_Meshes;
     std::string m_Directory;
+    std::vector<Texture> textures_loaded;
 
     void loadModel(const std::string& path);
     void processNode(aiNode* node, const aiScene* scene);

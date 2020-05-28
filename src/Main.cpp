@@ -109,9 +109,7 @@ int main()
 	
 	glm::mat4 projection = glm::perspective(glm::radians(50.0f), (float)1280 / 720, 0.1f, 100.0f);
 	glm::mat4 transform = glm::mat4(1);
-	transform = glm::scale(transform, glm::vec3(0.3));
-
-
+	//transform = glm::scale(transform, glm::vec3(0.3));
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetCursorPosCallback(window, mouseCallback);
 	glfwSetWindowSizeCallback(window, framebufferSizeCallback);
@@ -131,8 +129,10 @@ int main()
 		shader.SetMat4("projection", projection);
 		shader.SetMat4("model", transform);
 		shader.SetMat4("view", view);
+		diffuseTexture.Bind();
+		shader.SetInt("texture_diffuse1", 0);
 		//cube->Draw(shader);
-		model.Draw();
+		model.Draw(shader);
 		shader.Unbind();
 
 		glfwPollEvents();

@@ -12,7 +12,7 @@ public:
     std::vector<Texture>      m_Textures;
 
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
-    void Draw() const;
+    void Draw(const Shader& shader) const;
 private:
     //  render data
     std::unique_ptr<VertexArray> m_VAO;
