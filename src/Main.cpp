@@ -99,7 +99,7 @@ int main()
 	textures.push_back(diffuseTexture);
 
 	// Create Mesh
-	//Mesh* cube = new Mesh(vertices, indices, textures);
+	Mesh* cube = new Mesh(vertices, indices, textures);
 	Model model("res/model/backpack.obj");
 
 	// Shader ////////////////////////////////////////////////////////////////////
@@ -129,8 +129,9 @@ int main()
 		shader.SetMat4("projection", projection);
 		shader.SetMat4("model", transform);
 		shader.SetMat4("view", view);
+		shader.SetVec3("viewPos", camera.GetCameraPos().x, camera.GetCameraPos().y, camera.GetCameraPos().z);
 		diffuseTexture.Bind();
-		shader.SetInt("texture_diffuse1", 0);
+		//shader.SetInt("texture_diffuse1", 0);
 		//cube->Draw(shader);
 		model.Draw(shader);
 		shader.Unbind();
